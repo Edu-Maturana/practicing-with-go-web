@@ -8,6 +8,7 @@ import (
 	"strconv"
 
 	"github.com/gorilla/mux"
+	"github.com/rs/xid"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -24,7 +25,14 @@ func GetUser(w http.ResponseWriter, r *http.Request) {
 	var user models.User
 	id, _ := strconv.ParseInt(params["id"], 10, 64)
 	db.First(&user, id)
-	json.NewEncoder(w).Encode(user)
+
+	if user.Id == "" {
+		w.WriteHeader(http.StatusNotFound)
+		json.NewEncoder(w).Encode("User not found")
+	} else {
+		json.NewEncoder(w).Encode(user)
+	}
+
 }
 
 func CreateUser(w http.ResponseWriter, r *http.Request) {
@@ -32,6 +40,7 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 	var user models.User
 	_ = json.NewDecoder(r.Body).Decode(&user)
 
+	user.Id = xid.New().String()
 	hashedPassword, _ := bcrypt.GenerateFromPassword([]byte(user.Password), 10)
 	user.Password = string(hashedPassword)
 

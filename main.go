@@ -17,6 +17,6 @@ func main() {
 	mux.HandleFunc("/users/{id}", handlers.UpdateUser).Methods("PUT")
 	mux.HandleFunc("/users/{id}", handlers.DeleteUser).Methods("DELETE")
 
-	fmt.Println("Servidor corriendo en el puerto 8080")
-	http.ListenAndServe(":8080", mux)
+	fmt.Println("Server running!")
+	http.ListenAndServe(":3000", mux)
 }
