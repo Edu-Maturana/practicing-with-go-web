@@ -8,6 +8,7 @@ import (
 	"strconv"
 
 	"github.com/gorilla/mux"
+	"golang.org/x/crypto/bcrypt"
 )
 
 func GetUsers(w http.ResponseWriter, r *http.Request) {
@@ -30,6 +31,10 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 	db := database.Connection()
 	var user models.User
 	_ = json.NewDecoder(r.Body).Decode(&user)
+
+	hashedPassword, _ := bcrypt.GenerateFromPassword([]byte(user.Password), 10)
+	user.Password = string(hashedPassword)
+
 	db.Create(&user)
 	json.NewEncoder(w).Encode(user)
 }
